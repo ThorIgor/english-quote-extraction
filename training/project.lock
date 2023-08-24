@@ -1,0 +1,45 @@
+install:
+  cmd: python -m spacy run install
+  script:
+    - pip install -r requirements.txt
+  deps: []
+  outs: []
+  spacy_version: 3.6.1
+  spacy_git_version: 458bc5f45
+preprocess_dataset:
+  cmd: python -m spacy run preprocess_dataset
+  script:
+    - python scripts/preprocess.py assets/english-quote-extraction.jsonl data/english-quote-extraction_train.spacy
+      data/english-quote-extraction_dev.spacy 0.2
+  deps:
+    - path: assets/english-quote-extraction.jsonl
+      md5: b2695f5434c5e1a1233498ad022faeb8
+    - path: scripts/preprocess.py
+      md5: 127856e8030693237e24053f2b9c61a2
+  outs:
+    - path: data/english-quote-extraction_train.spacy
+      md5: c20b454d60b67a69a08310af71d1fd42
+    - path: data/english-quote-extraction_dev.spacy
+      md5: b3710881471d117af4824bf2910104ad
+  spacy_version: 3.6.1
+  spacy_git_version: 458bc5f45
+train_textcat:
+  cmd: python -m spacy run train_textcat
+  script:
+    - python -m spacy train configs/base_config.cfg --output models/resilience_data/base_config/
+      --paths.train data/resilience_data_train.spacy --paths.dev data/resilience_data_dev.spacy
+      --gpu-id -1 --nlp.lang ru
+    - python -m spacy evaluate models/resilience_data/base_config/model-best data/resilience_data_dev.spacy
+      --output metrics/base_config.json --gpu-id -1
+  deps:
+    - path: configs/base_config.cfg
+      md5: d1eeeb1c237f3fd9fb6c8b2984c22178
+    - path: data/resilience_data_train.spacy
+      md5: 07c29683da0837a7b104398e3062c1a3
+    - path: data/resilience_data_dev.spacy
+      md5: d11d16df80075b94f4c7bd74ce6062f4
+  outs:
+    - path: models/resilience_data/base_config/model-best
+      md5: e7c35010ee1a32a59acee775b512c02c
+  spacy_version: 3.5.1
+  spacy_git_version: 8153bd573

@@ -1,0 +1,63 @@
+title: "Resilience textcat"
+description: "This project desined to train categorizer for resilience relevant text extraction task"
+
+vars:
+  #base_config - base textcat_multilabel
+  #transformer_config - use transformer for embedding
+  config: "transformer_config"
+  dataset: "english-quote-extraction"
+  
+  train: "train"
+  dev: "dev"
+  
+  lang: "ru"
+  
+  gpu_id: -1
+  eval_split: 0.2
+  
+  textcat_model: models/${vars.dataset}/${vars.config}/model-best
+
+
+directories: ["assets", "models", "configs", "scripts", "data", "metrics"]
+ 
+workflows:
+  preprocess:
+    - install
+    - preprocess_dataset
+  ner:
+    - train_ner
+
+commands:
+  - name: "install"
+    help: "Install requirements"
+    script:
+      - "pip install -r requirements.txt"
+    
+  - name: "preprocess_dataset"
+    help: "Format `dataset` into .spaCy training format"
+    script:
+      - "python scripts/preprocess.py assets/${vars.dataset}.jsonl data/${vars.dataset}_${vars.train}.spacy data/${vars.dataset}_${vars.dev}.spacy ${vars.eval_split}"
+    deps:
+      - "assets/${vars.dataset}.jsonl"
+      - "scripts/preprocess.py"
+    outputs:
+      - "data/${vars.dataset}_${vars.train}.spacy"
+      - "data/${vars.dataset}_${vars.dev}.spacy"
+  
+  - name: "train_ner"
+    help: "Train a spancat model on the `dataset`"
+    script:
+      - "python -m spacy train configs/${vars.config}.cfg --output models/${vars.dataset}/${vars.config}/ --paths.train data/${vars.dataset}_${vars.train}.spacy --paths.dev data/${vars.dataset}_${vars.dev}.spacy --gpu-id ${vars.gpu_id} --nlp.lang ${vars.lang}"
+      - "python -m spacy evaluate ${vars.textcat_model} data/${vars.dataset}_${vars.dev}.spacy --output metrics/${vars.config}.json --gpu-id ${vars.gpu_id}"
+    deps:
+      - "configs/${vars.config}.cfg"
+      - "data/${vars.dataset}_${vars.train}.spacy"
+      - "data/${vars.dataset}_${vars.dev}.spacy"
+    outputs:
+      - "${vars.textcat_model}"
+      
+  - name: "reset"
+    help: "Reset the project to its original state and delete all training process"
+    script:
+      - "python scripts/reset.py models"
+      - "python scripts/reset.py data"
