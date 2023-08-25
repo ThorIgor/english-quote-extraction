@@ -246,7 +246,6 @@ def correct(
             task["spans"] = spans
             task[BINARY_ATTR] = False
             task = set_hashes(task)
-            print(task['text'])
             yield task
 
     def make_update(answers: Iterable[dict]) -> None:
