@@ -246,6 +246,7 @@ def correct(
             task["spans"] = spans
             task[BINARY_ATTR] = False
             task = set_hashes(task)
+            print(task['text'])
             yield task
 
     def make_update(answers: Iterable[dict]) -> None:
@@ -264,7 +265,16 @@ def correct(
                 examples.append(Example(doc, ref))
         nlp.update(examples)
 
+    def dedup(stream):
+        cache = []
+        for eg in stream:
+            if eg['text'] in cache:
+                continue
+            cache.append(eg['text'])
+            yield eg
+
     stream = make_tasks(nlp, stream)
+    stream = dedup(stream)
 
     return {
         "view_id": "blocks",
