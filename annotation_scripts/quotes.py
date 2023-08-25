@@ -189,7 +189,6 @@ def correct(
         update: bool = False,
         exclude: Optional[List[str]] = None,
         unsegmented: bool = False,
-        annotator: Optional[str] = "No name"
 ) -> RecipeSettingsType:
     """
     Create gold data for NER by correcting a model's suggestions.

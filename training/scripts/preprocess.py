@@ -35,11 +35,14 @@ def main(
                     if example["spans"] is None:
                         example["spans"] = []
                     for span in example["spans"]:
+                        if span["token_start"] > 0:
+                            if doc[span["token_start"]-1].text.lower() in ["the", "a", "an"]:
+                                span["token_start"] -= 1
                         spans.append(
                             Span(
                                 doc,
                                 span["token_start"],
-                                span["token_end"],
+                                span["token_end"]+1,
                                 span["label"],
                             )
                         )
@@ -49,7 +52,7 @@ def main(
 
                         total_span_count[span["label"]] += 1
 
-                        span_length = (span["token_end"]) - span["token_start"]
+                        span_length = (span["token_end"]+1) - span["token_start"]
                         if span_length > max_span_length:
                             max_span_length = span_length
 
