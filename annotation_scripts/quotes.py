@@ -203,7 +203,7 @@ def correct(
     nlp = spacy.load(spacy_model)
     labels = label
     model_labels = nlp.pipe_labels.get('ner', [])
-    model = EntityRecognizer(nlp, label=label)
+    model = EntityRecognizer(nlp, label = labels)
     orig_nlp = copy_nlp(nlp)
     if not labels:
         labels = model_labels
