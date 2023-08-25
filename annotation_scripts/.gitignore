@@ -1,0 +1,8 @@
+*
+!.gitignore
+!AnnotationGuide.html
+!prodigy.json
+!quotes.py
+!README.md
+!recipe.py
+!requirements.txt
