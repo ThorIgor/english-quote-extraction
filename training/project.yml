@@ -10,9 +10,9 @@ vars:
   train: "train"
   dev: "dev"
   
-  lang: "ru"
+  lang: "en"
   
-  gpu_id: -1
+  gpu_id: 0
   eval_split: 0.2
   
   textcat_model: models/${vars.dataset}/${vars.config}/model-best
